@@ -1,0 +1,151 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    showstringspaces=false
+}
+
+\title{Machine Learning Homework 1 Report}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Student Information}
+\begin{tabular}{ll}
+    Name: & \underline{\hspace{6cm}} \\
+    Student Number: & \underline{\hspace{6cm}}
+\end{tabular}
+
+\newpage
+
+\section*{Question 1}
+
+\subsection*{a) Test Performance}
+
+The ID3 decision tree classifier was trained on 80\% of the Car Evaluation dataset (1,382 examples) and evaluated on the remaining 20\% (346 examples) as the test set. The full unpruned tree is used for evaluation.
+
+\subsubsection*{Test Performance Metrics (Full Unpruned Tree):}
+\begin{itemize}
+    \item \textbf{Accuracy:} 0.9362
+    \item \textbf{Precision (macro):} 0.8719
+    \item \textbf{Recall (macro):} 0.8860
+    \item \textbf{F1-Score (macro):} 0.8787
+\end{itemize}
+
+\subsubsection*{Comments on Results:}
+
+The unpruned ID3 tree achieves excellent performance with 93.6\% accuracy on the test set, demonstrating strong overall classification capability. The macro-averaged metrics are also robust: precision of 0.8719, recall of 0.8860, and F1-score of 0.8787 indicate balanced performance across all four classes. The close alignment between accuracy and macro-F1 suggests that despite the Car Evaluation dataset's class imbalance (with ``unacc'' comprising roughly 70\% of examples), the tree generalizes reasonably well to minority classes (``acc'', ``good'', and ``vgood'').
+
+Post-pruning was attempted with a validation split to prevent overfitting and improve generalization; however, the pruned tree's performance degraded to 88.4\% accuracy with lower macro-F1 (0.7050). The reduced performance indicates that aggressive pruning removed important decision boundaries for minority classes. Therefore, the full unpruned tree is retained for its superior test performance, accepting the minor risk of overfitting in exchange for higher predictive accuracy on this particular dataset.
+
+\newpage
+
+\subsection*{b) Implementation Explanation}
+
+The decision tree implementation follows the standard ID3 (Iterative Dichotomiser 3) algorithm with the following components:
+
+\subsubsection*{Core Algorithm Steps:}
+
+\begin{enumerate}
+    \item \textbf{Data Structure:} A \texttt{TreeNode} class stores:
+    \begin{itemize}
+        \item \texttt{attribute}: Index of the splitting attribute at internal nodes
+        \item \texttt{prediction}: Class label for leaf nodes
+        \item \texttt{majority\_label}: Fallback class for handling unseen attribute values during prediction
+        \item \texttt{children}: Dictionary mapping attribute values to child nodes
+    \end{itemize}
+
+    \item \textbf{Entropy Calculation:} For a dataset $S$, entropy is computed as:
+    \[
+    H(S) = -\sum_{c \in \text{Classes}} p(c) \log_2 p(c)
+    \]
+    where $p(c)$ is the proportion of class $c$ in $S$.
+
+    \item \textbf{Information Gain:} For each attribute $A$, information gain measures the reduction in entropy after splitting:
+    \[
+    \text{Gain}(S, A) = H(S) - \sum_{v \in \text{Values}(A)} \frac{|S_v|}{|S|} H(S_v)
+    \]
+    where $S_v$ is the subset of $S$ with attribute $A = v$.
+
+    \item \textbf{Best Attribute Selection:} The algorithm greedily chooses the attribute with maximum information gain at each node.
+
+    \item \textbf{Recursive Tree Building:} The tree is constructed recursively until one of the following stopping conditions is met:
+    \begin{enumerate}
+        \item If all examples have the same label, create a leaf node with that label.
+        \item If no attributes remain, create a leaf with the majority class label.
+        \item For empty subsets (no examples with a particular attribute value), create a leaf with the parent node's majority label as fallback.
+    \end{enumerate}
+    Otherwise, select the best attribute, create an internal node, and recurse on subsets for each attribute value.
+
+\end{enumerate}
+
+\subsubsection*{Key Implementation Features:}
+
+\begin{itemize}
+    \item \textbf{Modular Design:} Each component (entropy, information gain, splitting, best attribute selection, prediction, evaluation) is implemented as a separate function for clarity and reusability.
+    \item \textbf{Categorical Attributes:} The dataset contains only categorical features. The algorithm creates branches for all known values of the splitting attribute.
+    \item \textbf{Majority Label Storage:} Each internal node stores its dataset's majority class, allowing graceful handling of unseen attribute values during prediction (fallback prediction).
+    \item \textbf{Train-Test Split:} The dataset is split 80-20 into training and test sets using a fixed random state (42) to ensure reproducible results.
+\end{itemize}
+
+\newpage
+
+\subsection*{c) Decision Rules as Propositional Logic Formula}
+
+The learned tree encodes classification rules as a disjunction (OR) of conjunctions (AND) derived from each root-to-leaf path. Each path from root to leaf represents one decision rule.
+
+Let the attributes be:
+\begin{itemize}
+    \item $A_1 = \text{buying price}$ (values: vhigh, high, med, low)
+    \item $A_2 = \text{maintenance cost}$ (values: vhigh, high, med, low)
+    \item $A_3 = \text{doors}$ (values: 2, 3, 4, 5more)
+    \item $A_4 = \text{persons}$ (values: 2, 4, more)
+    \item $A_5 = \text{lug\_boot}$ (values: small, med, big)
+    \item $A_6 = \text{safety}$ (values: low, med, high)
+\end{itemize}
+
+The decision tree's learned rules can be expressed as:
+
+\[
+\text{class} = \bigvee_{\text{path } p} \left( \bigwedge_{\text{edge } e \in p} \text{condition}(e) \land \text{predict}(p) \right)
+\]
+
+where each path $p$ from root to leaf produces one disjunct:
+
+\begin{small}
+\begin{align*}
+\text{Prediction} = & \left[ (A_6 = \text{low}) \land \text{class} = \text{unacc} \right] \lor \\
+& \left[ (A_6 = \text{med}) \land (A_2 = \text{high} \lor A_2 = \text{vhigh}) \land \text{class} = \text{unacc} \right] \lor \\
+& \left[ (A_6 = \text{med}) \land (A_2 \in \{\text{low}, \text{med}\}) \land (A_4 = 2) \land \text{class} = \text{unacc} \right] \lor \\
+& \left[ (A_6 = \text{med}) \land (A_2 \in \{\text{low}, \text{med}\}) \land (A_4 \neq 2) \land (A_1 \in \{\text{high}, \text{vhigh}\}) \land \text{class} = \text{acc} \right] \lor \\
+& \left[ (A_6 = \text{high}) \land (A_1 \in \{\text{high}, \text{vhigh}\}) \land (A_2 \in \{\text{high}, \text{vhigh}\}) \land \text{class} = \text{unacc} \right] \lor \\
+& \left[ (A_6 = \text{high}) \land (A_1 \in \{\text{high}, \text{vhigh}\}) \land (A_2 \in \{\text{low}, \text{med}\}) \land (A_5 = \text{small}) \land \text{class} = \text{acc} \right] \lor \\
+& \left[ (A_6 = \text{high}) \land (A_1 \in \{\text{high}, \text{vhigh}\}) \land (A_2 \in \{\text{low}, \text{med}\}) \land (A_5 \in \{\text{med}, \text{big}\}) \land \text{class} = \text{good} \right] \lor \\
+& \left[ (A_6 = \text{high}) \land (A_1 \in \{\text{low}, \text{med}\}) \land \text{class} = \text{vgood} \right]
+\end{align*}
+\end{small}
+
+\textbf{Interpretation:} The dominant patterns the tree learned are:
+\begin{itemize}
+    \item Low safety $\Rightarrow$ unacceptable car
+    \item High safety + low/med buying price + low/med maintenance $\Rightarrow$ very good car
+    \item High safety + high buying/maintenance prices $\Rightarrow$ unacceptable car
+    \item High safety + low buying price $\Rightarrow$ good or very good (depending on trunk size)
+\end{itemize}
+
+\end{document}
+
