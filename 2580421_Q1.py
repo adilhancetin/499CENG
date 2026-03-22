@@ -30,6 +30,7 @@ class CarDataset:
         return self.values[-1]
 
 
+# Load car dataset from file
 def load_car_dataset(file_path):
     dataset = []
 
@@ -49,6 +50,7 @@ def load_car_dataset(file_path):
     return dataset
 
 
+# Split dataset into train and test sets
 def train_test_split(examples, test_size=0.2, random_state=42):
     shuffled = examples[:]
     random.Random(random_state).shuffle(shuffled)
@@ -58,6 +60,7 @@ def train_test_split(examples, test_size=0.2, random_state=42):
     train_set = shuffled[test_count:]
     return train_set, test_set
 
+# Filter dataset by attribute value
 def split_dataset_on_attribute_value(dataset, attribute_index, attribute_value):
     subset = []
     for example in dataset:
@@ -65,6 +68,7 @@ def split_dataset_on_attribute_value(dataset, attribute_index, attribute_value):
             subset.append(example)
     return subset
 
+# Check if all labels are the same
 def check_same_labels(train_set):
     if not train_set:
         return True
@@ -75,6 +79,7 @@ def check_same_labels(train_set):
             return False
     return True
 
+# Calculate entropy of a dataset
 def calculate_entropy(dataset):
     if not dataset:
         return 0.0
@@ -93,6 +98,7 @@ def calculate_entropy(dataset):
         sigma -= p * math.log2(p)
     return sigma   
 
+# Get unique values of an attribute
 def attr_values_helper(dataset, attribute_index):
     att_values = []
     for example in dataset:
@@ -101,6 +107,7 @@ def attr_values_helper(dataset, attribute_index):
             att_values.append(att_value)
     return att_values    
 
+# Calculate information gain for an attribute
 def calculate_information_gain(dataset, attribute_index):
     if not dataset:
         return 0.0
@@ -114,6 +121,7 @@ def calculate_information_gain(dataset, attribute_index):
 
     return calculate_entropy(dataset) - sigma   
 
+# Find most common label in dataset
 def find_majority_label(dataset):
     if not dataset:
         return None
@@ -129,6 +137,7 @@ def find_majority_label(dataset):
     return majority_label
 
 
+# Build the ID3 tree recursively
 def id3_training_loop(current_node, train_set, attributes, fallback_label):
 
     if not train_set:
@@ -169,6 +178,7 @@ def id3_training_loop(current_node, train_set, attributes, fallback_label):
     return current_node
 
 
+# Predict label for one example
 def predict_example(root_node, example):
     current_node = root_node
 
@@ -194,6 +204,7 @@ def predict_dataset(root_node, dataset):
     return predictions
 
 
+# Calculate accuracy score
 def accuracy_score(y_true, y_pred):
     if not y_true:
         return 0.0
@@ -206,6 +217,7 @@ def accuracy_score(y_true, y_pred):
     return correct / len(y_true)
 
 
+# Calculate macro precision, recall, and F1
 def precision_recall_f1_macro(y_true, y_pred):
     labels = sorted(set(y_true) | set(y_pred))
     if not labels:
