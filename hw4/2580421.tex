@@ -1,0 +1,242 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\geometry{margin=1in}
+
+\title{CENG499 Homework 4 Report}
+\author{Name: Adilhan Çetin \\ Number: 2580421}
+
+\begin{document}
+
+\maketitle
+
+\section*{Question 1}
+
+\subsection*{a)}
+
+We should start by finding Euclidian distances of test instance to training instance. It can be found by the following Euclidian distance formula:
+$$d(x_{i},x_{j})=\sqrt{\sum_{p=1}^{n}(a_{p}(x_{i})-a_{p}(x_{j}))^{2}}$$
+
+\begin{itemize}
+    \item $d(x_q, x_1) = \sqrt{(1-1)^2 + (1-1)^2 + (0-1)^2} = 1$
+    \item $d(x_q, x_2) = \sqrt{(1-2)^2 + (1-1)^2 + (0-0)^2} = 1$
+    \item $d(x_q, x_3) = \sqrt{(1-0)^2 + (1-2)^2 + (0-2)^2} = \sqrt{6}$
+\end{itemize}
+
+
+\subsection*{b)}
+
+We can find weight by the following formula provided by the question:
+$$w_i = \left( \frac{1}{d(x_*, x_i) + \varepsilon} \right)^2$$
+
+Since $\varepsilon = 10^{-8}$, we can omit it, the results will be:
+
+\begin{itemize}
+    \item \textbf{Weight for $x_1$:}
+    $$w_1 = \left( \frac{1}{1} \right)^2 = 1$$
+
+    \item \textbf{Weight for $x_2$:}
+    $$w_2 = \left( \frac{1}{1} \right)^2 = 1$$
+
+    \item \textbf{Weight for $x_3$:}
+    $$w_3 = \left( \frac{1}{\sqrt{6}} \right)^2 = \frac{1}{6}$$
+\end{itemize}
+
+\subsection*{c)}
+
+
+We can compute this by the following formula given in the question:
+$$u_j(x_*) = \frac{\sum_{i=1}^k \mu_j(x_i) \left( \frac{1}{d(x_*, x_i) + \varepsilon} \right)^{\frac{2}{m-1}}}{\sum_{i=1}^k \left( \frac{1}{d(x_*, x_i) + \varepsilon} \right)^{\frac{2}{m-1}}} for k=3 and m=2$$
+
+Notice that we can substitute weight for some part of this formula. Also we are using crisp labels(rounding $ u_j(x_i)$ to 0 or 1):
+
+\begin{itemize}
+    \item $\displaystyle u_1(x_*) = \frac{1(1) + 0(1) + 0\left(\frac{1}{6}\right)}{\frac{13}{6}} = \frac{1 + 0 + 0}{\frac{13}{6}} = \frac{1}{\frac{13}{6}} = \frac{6}{13} = 0.462$
+    
+    \item $\displaystyle u_2(x_*) = \frac{0(1) + 1(1) + 0\left(\frac{1}{6}\right)}{\frac{13}{6}} = \frac{0 + 1 + 0}{\frac{13}{6}} = \frac{1}{\frac{13}{6}} = \frac{6}{13} = 0.462$
+    
+    \item $\displaystyle u_3(x_*) = \frac{0(1) + 0(1) + 1\left(\frac{1}{6}\right)}{\frac{13}{6}} = \frac{0 + 0 + \frac{1}{6}}{\frac{13}{6}} = \frac{\frac{1}{6}}{\frac{13}{6}} = \frac{1}{13} = 0.077$
+    
+    \item $\displaystyle u_4(x_*) = \frac{0(1) + 0(1) + 0\left(\frac{1}{6}\right)}{\frac{13}{6}} = \frac{0 + 0 + 0}{\frac{13}{6}} = 0$
+\end{itemize}
+
+Thus, the membership vector is:
+$$(u_1(x_*), u_2(x_*), u_3(x_*), u_4(x_*)) = \left( 0.462, 0.462, 0.077, 0 \right)$$
+
+\subsection*{d)}
+
+With the values we have calculated in part c.:
+
+$$ 0.462 + 0.462 + 0.077 + 0 = 1.001 $$
+
+We can see that membership values sum to 1.
+
+\subsection*{e)}
+
+When we look at the membership values that we calculated in part c, we can see that there is a tie between $C_1$ and $C_2$ by both being equal to 0.462. With this information, we can not say anything about the predicted class of the given test instance.
+
+\section*{Question 2}
+
+\subsection*{i.}
+
+The following table shows the evaluation metrics for classical kNN and distance-weighted kNN with $k \in \{4, 8\}$:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Method} & \textbf{$k$} & \textbf{Accuracy} & \textbf{Macro Prec.} & \textbf{Macro Rec.} & \textbf{Macro F1} \\
+\midrule
+Classical kNN & 4 & 0.6615 & 0.6370 & 0.5479 & 0.5742 \\
+Classical kNN & 8 & 0.7385 & 0.6597 & 0.6706 & 0.6509 \\
+\midrule
+Dist.-Weighted kNN & 4 & 0.7077 & 0.6806 & 0.5988 & 0.6185 \\
+Dist.-Weighted kNN & 8 & 0.7385 & 0.6420 & 0.5981 & 0.6092 \\
+\bottomrule
+\end{tabular}
+\caption{Classical kNN and distance-weighted kNN results for $k \in \{4, 8\}$.}
+\end{table}
+
+\subsection*{ii.}
+
+The following table shows the evaluation metrics for fuzzy kNN with all combinations of $k \in \{4, 8\}$ and $m \in \{1.5, 2.5\}$:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Method} & \textbf{$k$} & \textbf{$m$} & \textbf{Accuracy} & \textbf{Macro Prec.} & \textbf{Macro Rec.} & \textbf{Macro F1} \\
+\midrule
+Fuzzy kNN & 4 & 1.5 & 0.7231 & 0.7069 & 0.6075 & 0.6384 \\
+Fuzzy kNN & 4 & 2.5 & 0.7077 & 0.6795 & 0.5988 & 0.6186 \\
+Fuzzy kNN & 8 & 1.5 & 0.7385 & 0.7270 & 0.6227 & 0.6545 \\
+Fuzzy kNN & 8 & 2.5 & 0.7538 & 0.6738 & 0.6814 & 0.6620 \\
+\bottomrule
+\end{tabular}
+\caption{Fuzzy kNN results for all combinations of $k$ and $m$.}
+\end{table}
+
+\subsection*{iii.}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Method} & \textbf{Parameters} & \textbf{Accuracy} & \textbf{Macro Prec.} & \textbf{Macro Rec.} & \textbf{Macro F1} \\
+\midrule
+Classical kNN & $k=4$ & 0.6615 & 0.6370 & 0.5479 & 0.5742 \\
+Classical kNN & $k=8$ & 0.7385 & 0.6597 & 0.6706 & 0.6509 \\
+\midrule
+Dist.-Weighted kNN & $k=4$ & 0.7077 & 0.6806 & 0.5988 & 0.6185 \\
+Dist.-Weighted kNN & $k=8$ & 0.7385 & 0.6420 & 0.5981 & 0.6092 \\
+\midrule
+Fuzzy kNN & $k=4, m=1.5$ & 0.7231 & 0.7069 & 0.6075 & 0.6384 \\
+Fuzzy kNN & $k=4, m=2.5$ & 0.7077 & 0.6795 & 0.5988 & 0.6186 \\
+Fuzzy kNN & $k=8, m=1.5$ & 0.7385 & 0.7270 & 0.6227 & 0.6545 \\
+Fuzzy kNN & $k=8, m=2.5$ & 0.7538 & 0.6738 & 0.6814 & 0.6620 \\
+\bottomrule
+\end{tabular}
+\caption{Complete comparison of all methods and parameter settings.}
+\end{table}
+
+\subsection*{iv.)}
+
+We can see that fuzzy kNN has the best performance overall. The reason behind that is fuzzy kNN takes into account the degree of membership of each neighbor, which allows it to make more nuanced predictions compared to classical kNN and distance-weighted kNN. This is especially beneficial in cases where the data points are not clearly separated, as it can capture the uncertainty in the classification process.
+
+\subsection*{v.)}
+
+We can see that increasing k in the all 3 methods results in better performance. This is because with a larger $k(k=8)$, the model can get more information from the neighbors, which leads to more accurate predictions.
+
+\subsection*{vi.)}
+
+The m value controls how much influence distance has on the membership values. It can be seen from the formula:
+$$w_i = \left( \frac{1}{d(x_q, x_i) + \varepsilon} \right)^{\frac{2}{m-1}}$$
+
+Increasing m value will result in a smaller exponent, which means distance will be reduced. This leads to more uniform membership values across neighbors. When we look at our evaluation metrics, we can see that all of them are decreasing when we increase m value from 1.5 to 2.5. The reason is our model is less sensitive to the distances of the neighbours. Since our dataset is not seperated well(this can be inferred from the classes in part xiii.), this result is expected.
+
+\subsection*{vii.}
+
+The following confusion matrices show the best parameter setting (in terms of macro F1) for each of the 3 methods. For classical kNN, $k=8$ gives the best F1 score of 0.6509. For distance-weighted kNN, $k=4$ gives the best F1 score of 0.6185. For fuzzy kNN, $k=8$ and $m=2.5$ gives the best F1 score of 0.6620.
+
+
+\textbf{Classical kNN ($k=8$), Macro F1 = 0.6509:}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l|cccccc}
+\toprule
+Actual $\backslash$ Predicted & 1 & 2 & 3 & 5 & 6 & 7 \\
+\midrule
+1 & 21 & 4 & 0 & 0 & 0 & 0 \\
+2 & 3 & 15 & 0 & 0 & 1 & 0 \\
+3 & 2 & 3 & 0 & 0 & 0 & 0 \\
+5 & 0 & 0 & 0 & 2 & 0 & 1 \\
+6 & 0 & 0 & 0 & 0 & 2 & 0 \\
+7 & 1 & 2 & 0 & 0 & 0 & 8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Distance-Weighted kNN ($k=4$), Macro F1 = 0.6185:}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l|cccccc}
+\toprule
+Actual $\backslash$ Predicted & 1 & 2 & 3 & 5 & 6 & 7 \\
+\midrule
+1 & 20 & 3 & 2 & 0 & 0 & 0 \\
+2 & 2 & 15 & 1 & 1 & 0 & 0 \\
+3 & 1 & 3 & 1 & 0 & 0 & 0 \\
+5 & 0 & 0 & 0 & 2 & 0 & 1 \\
+6 & 0 & 1 & 0 & 0 & 1 & 0 \\
+7 & 1 & 2 & 0 & 1 & 0 & 7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Fuzzy kNN ($k=8, m=2.5$), Macro F1 = 0.6620:}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l|cccccc}
+\toprule
+Actual $\backslash$ Predicted & 1 & 2 & 3 & 5 & 6 & 7 \\
+\midrule
+1 & 20 & 4 & 1 & 0 & 0 & 0 \\
+2 & 1 & 17 & 0 & 0 & 1 & 0 \\
+3 & 2 & 3 & 0 & 0 & 0 & 0 \\
+5 & 0 & 0 & 0 & 2 & 0 & 1 \\
+6 & 0 & 0 & 0 & 0 & 2 & 0 \\
+7 & 1 & 2 & 0 & 0 & 0 & 8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{viii.)}
+
+When we look at the confusion matrices, we can see that class 3 is the most difficult to classify. In the classical kNN and fuzzy kNN matrices, class 3 has 0 correct predictions out of 5 instances. All of its instances are misclassified as class 1 or class 2. Even in the distance-weighted kNN, it only gets 1 correct out of 5. This shows that class 3 shares very similar features with classes 1 and 2, which makes it hard for the model to distinguish them.
+
+\subsection*{ix.)}
+
+When we look at the confusion matrices, we can see that classes 1 and 2 are the most frequently confused with each other. For example, in the classical kNN matrix, 4 instances of class 1 are predicted as class 2, and 3 instances of class 2 are predicted as class 1. Class 3 is also always confused with classes 1 and 2 since all of its misclassified instances go to these two classes. On the other hand, classes 5, 6, and 7 are relatively well separated from each other and from the other classes.
+
+\section*{Implementation Description}
+
+For the nearest neighbor search, I used a max-heap of size $k$ to efficiently find the $k$ nearest neighbors. While scanning the training set, I push instances into the heap and if the heap size exceeds $k$, I replace the farthest neighbor with the current instance if it is closer. This gives $O(n \log k)$ time complexity instead of $O(n \log n)$ for a full sort.
+
+For classical kNN, I count the votes of the $k$ nearest neighbors and assign the class with the most votes. In case of a tie, I select the class with the smallest index.
+
+For distance-weighted kNN, I compute the weight of each neighbor using the formula $w_i = \frac{1}{d_i^2 + \varepsilon}$ where $\varepsilon = 10^{-8}$. Then I sum the weights for each class and assign the class with the highest total weight.
+
+For fuzzy kNN, I compute membership values using the formula given in the assignment. Since training labels are crisp, the membership $u_j(x_i)$ is 1 if $x_i$ belongs to class $c_j$ and 0 otherwise. The predicted class is the one with the highest membership value.
+
+Before running the experiments, I split the data into 70\% training and 30\% test sets with random state 42. I normalize features using Z-score normalization where the mean and standard deviation are computed from the training set only to avoid data leakage.
+
+\end{document}
